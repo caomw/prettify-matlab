@@ -16,7 +16,6 @@ Currently the code recognizes the following constructs:
  - command prompt/command output (`>> now`)
  - MATLAB language keywords (`if`, `else`, `end`, etc...)
  - some special variables and constants (`inf`, `nan`, `varargin`, etc..)
- - over 600 of the most commly used builtin functions (`cos`, `plot`, etc...)
 
 See the wiki for sample screenshots.
 
