@@ -27,6 +27,7 @@ var PR_IDENTIFIER = "ident",
 
 <% if DETECT_FUNCTIONS %>
 // Refer to: http://www.mathworks.com/help/techdoc/ref/f16-6011.html
+<%# get all file lines and join them as one string %>
 var coreFunctions = '<%= get_all_lines("./functions/core.txt").join("|") %>';
 var statsFunctions = '<%= get_all_lines("./functions/stats.txt").join("|") %>';
 var imageFunctions = '<%= get_all_lines("./functions/image.txt").join("|") %>';

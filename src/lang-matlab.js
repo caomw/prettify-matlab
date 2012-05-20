@@ -28,6 +28,7 @@
  *     </pre>
  */
 (function (PR) {
+<%# get file, render it as ERB template, and print each line %>
 <% render(get_file('./_main.js')).each_line do |line| %>
 	<%= line.chomp %>
 <% end %>

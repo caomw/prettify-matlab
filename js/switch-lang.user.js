@@ -54,7 +54,7 @@
 			add_language_selection_menu();
 		});
 
-		// REFERENCE: http://userscripts.org/scripts/show/71052
+// REFERENCE: http://userscripts.org/scripts/show/71052
 // REFERENCE: http://davidwalsh.name/twitter-dropdown-jquery
 function add_language_selection_menu() {
 	"use strict";
@@ -160,6 +160,5 @@ function unprettify(codeNode) {
 	<code></code>
 </pre>
 */
-
 	});
 })();

@@ -37,6 +37,7 @@
 
 	// insert our custom CSS styles
 	style_inject([
+<%# get file, and print each line as quoted string %>
 <% get_file_lines('../css/switch_lang.css') do |line| %>
 		<%= "'#{line}'," %>
 <% end %>
@@ -48,6 +49,7 @@
 			add_language_selection_menu();
 		});
 
-		<%= get_file('./_switch_lang.js') %>
+<%# insert file content as is %>
+<%= get_file('./_switch_lang.js') %>
 	});
 })();

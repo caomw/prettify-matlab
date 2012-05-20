@@ -37,6 +37,7 @@
 	
 	// insert our custom CSS styles
 	style_inject([
+<%# get file, render it as ERB template, and print each line as quoted string %>
 <% render(get_file('./lang-matlab.css')).each_line do |line| %>
 		<%= "'#{line.chomp}'," %>
 <% end %>
@@ -92,6 +93,7 @@
 		}
 		
 		function RegisterMATLABLanguageHandlers() {
+<%# get file, render it as ERB template, and print each line %>
 <% render(get_file('./_main.js')).each_line do |line| %>
 			<%= line.chomp %>
 <% end %>
