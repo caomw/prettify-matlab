@@ -37,7 +37,9 @@
 
 	// insert our custom CSS styles
 	style_inject([
-		//=INSERT_FILE_QUOTED= ../css/switch_lang.css
+<% get_file_lines('../css/switch_lang.css') do |line| %>
+		<%= "'#{line}'," %>
+<% end %>
 	].join(""));
 
 	script_inject(function () {
@@ -46,6 +48,6 @@
 			add_language_selection_menu();
 		});
 
-		//=INSERT_FILE= ./_switch_lang.js
+		<%= get_file('./_switch_lang.js') %>
 	});
 })();

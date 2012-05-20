@@ -4,26 +4,18 @@
 task :default => 'SO:build'
 
 # source files to be processed
-SOURCES = %w[lang-matlab.js prettify-matlab.user.js switch-lang.user.js prettify-mathworks-answers.user.js]
+SOURCES = %w[lang-matlab.css lang-matlab.js prettify-matlab.user.js switch-lang.user.js prettify-mathworks-answers.user.js]
 
 namespace :SO do
 	desc 'Builds both userscript and prettify extension JS files from templates'
 	task :build do
 		for name in SOURCES
-			source = File.open("src/#{name}", 'r')
-			target = File.open("js/#{name}", 'w')
-
-			puts "Building #{target.path}"
-
-			begin
-				process_file(source, target)
-			ensure
-				source.close
-				target.close
-			end
+			outDir = File.extname(name)[1..-1]		# js or css
+			r = Renderer.new("src/#{name}", "#{outDir}/#{name}")
+			r.processFiles
 		end
 	end
-	
+
 	desc 'Run watchr'
 	task :watchr do
 		require 'rubygems'
@@ -38,78 +30,69 @@ namespace :SO do
 	end
 end
 
-require 'tempfile'
+require 'erb'
 
-# process file by parsing //=INSERT_FILE*= instructions recursively
-# Adapted from: https://github.com/mislav/user-scripts/blob/master/Thorfile
-def process_file(source, target)
-	# read source line-by-line.
-	for line in source
-		case line
-		# match instructions: INSERT/RENDER, QUOTED, CONCATED
-		when %r{^(\s*)//=(INSERT|RENDER)_FILE(_QUOTED)?(_CONCATED)?=\s+(.*)$}
-			# get indentation, process mode, quoted lines, concatenated lines, and name of file to insert
-			indentation, processMode, doQuote, doConcat, filename = $1, $2, $3, $4, $5
+class Renderer
+	# class variables
+	DETECT_FUNCTIONS = true
 
-			# check file exists
-			filename = File.join(File.dirname(source.path), filename.strip)		# path relative to source
-			filename = File.expand_path(filename)
-			if not File.exist?(filename)
-				# warn user and pass line unchanged
-				puts "WARNING: file not found #{filename}"
-				target << line
-				next
-			end
+	# constructor: expects source/target filenames
+	def initialize(source_fname, target_fname)
+		@source_fname = source_fname
+		@target_fname = target_fname
+	end
 
-			# INSERT vs. RENDER
-			if processMode == 'RENDER'
-				template = File.open(filename, 'r')
-				tmp = Tempfile.new(File.basename(filename))	# create temp file to write to
-				begin
-					process_file(template, tmp)
-					# for the following, use the processed file instead of the raw one
-					filename = tmp.path
-				ensure
-					template.close
-					tmp.close
-				end
-			end
+	# process ERB template string (using current object context for evaluation)
+	# and return result
+	def render(str)
+		str.gsub!(/\r\n?/, "\n")	# make sure ERB template has UNIX line endings!
+		ERB.new(str, 0, "<>").result(get_binding)
+	end
 
-			# concatenate all file lines by "|" as one string
-			if doConcat
-				# read file lines and join by "|"
-				insert_line = File.readlines(filename).map(&:rstrip).join('|')
+	# process source file and write output to target
+	def processFiles()
+		source = File.open(@source_fname, 'r')
+		target = File.open(@target_fname, 'w')
 
-				# write concatenated line
-				target << indentation			# keep same level of indentation
-				target << (doQuote ? quote_string(insert_line) : insert_line)
-				target << "\n"					# insert new line at the end (was chopped by rstrip)
+		puts "Building #{target.path}"
 
-			# write file lines one-by-one
-			else
-				file = File.open(filename, 'r')
-				for insert_line in file
-					target << indentation		# keep same level of indentation
-					target << (doQuote ? quote_string(insert_line) : insert_line)
-				end
-				file.close
-			end
-
-			if processMode == 'RENDER'
-				# delete temporary file
-				tmp.unlink
-			end
-
-		# else pass the line unchanged to target
-		else
-			target << line
+		begin
+			# read input, process it, and write output to target
+			target << render(source.read)
+		ensure
+			source.close
+			target.close
 		end
 	end
-end
 
-# returns: 'str',
-def quote_string(str)
-	ret = "'" + str.gsub(/(\r\n?)$/,'') + "',"
-	ret += $1 if not $1.nil?
-	ret
+	# return file contents
+	def get_file(filename)
+		File.read(normalize_path(filename))
+	end
+
+	# yield file lines one at-a-time
+	def get_file_lines(filename)
+		file = File.open(normalize_path(filename), 'r')
+		#file.read().each_line do |line|
+		for line in file
+			yield line.chomp
+		end
+		file.close
+	end
+
+	# return all file lines as an array
+	def get_all_lines(filename)
+		File.readlines(normalize_path(filename)).map(&:chomp)
+	end
+
+	# return absolute path (evaluated relative to source file)
+	def normalize_path(filename)
+		filename = File.join(File.dirname(@source_fname), filename.strip)
+		filename = File.expand_path(filename)
+	end
+
+	# templating using current object's member data/methods
+	def get_binding
+		binding
+	end
 end

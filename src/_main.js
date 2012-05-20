@@ -14,8 +14,10 @@
 */
 var PR_IDENTIFIER = "ident",
 	PR_CONSTANT = "const",
+<% if DETECT_FUNCTIONS %>
 	PR_FUNCTION = "fun",
 	PR_FUNCTION_TOOLBOX = "fun_tbx",
+<% end %>
 	PR_SYSCMD = "syscmd",
 	PR_CODE_OUTPUT = "codeoutput",
 	PR_ERROR = "err",
@@ -23,19 +25,13 @@ var PR_IDENTIFIER = "ident",
 	PR_TRANSPOSE = "transpose",
 	PR_LINE_CONTINUATION = "linecont";
 
+<% if DETECT_FUNCTIONS %>
 // Refer to: http://www.mathworks.com/help/techdoc/ref/f16-6011.html
-var coreFunctions = [
-	//=INSERT_FILE_QUOTED_CONCATED= ./functions/core.txt
-].join("|");
-var statsFunctions = [
-	//=INSERT_FILE_QUOTED_CONCATED= ./functions/stats.txt
-].join("|");
-var imageFunctions = [
-	//=INSERT_FILE_QUOTED_CONCATED= ./functions/image.txt
-].join("|");
-var optimFunctions = [
-	//=INSERT_FILE_QUOTED_CONCATED= ./functions/optim.txt
-].join("|");
+var coreFunctions = '<%= get_all_lines("./functions/core.txt").join("|") %>';
+var statsFunctions = '<%= get_all_lines("./functions/stats.txt").join("|") %>';
+var imageFunctions = '<%= get_all_lines("./functions/image.txt").join("|") %>';
+var optimFunctions = '<%= get_all_lines("./functions/optim.txt").join("|") %>';
+<% end %>
 
 // identifiers: variable/function name, or a chain of variable names joined by dots (obj.method, struct.field1.field2, etc..)
 // valid variable names (start with letter, and contains letters, digits, and underscores).
@@ -109,11 +105,13 @@ var identifiersPatterns = [
 	// some data types
 	[PR.PR_TYPE, /^\b(?:cell|struct|char|double|single|logical|u?int(?:8|16|32|64)|sparse)\b/, null],
 
+<% if DETECT_FUNCTIONS %>
 	// commonly used builtin functions from core MATLAB and a few popular toolboxes
 	[PR_FUNCTION, new RegExp('^\\b(?:' + coreFunctions + ')\\b'), null],
 	[PR_FUNCTION_TOOLBOX, new RegExp('^\\b(?:' + statsFunctions + ')\\b'), null],
 	[PR_FUNCTION_TOOLBOX, new RegExp('^\\b(?:' + imageFunctions + ')\\b'), null],
 	[PR_FUNCTION_TOOLBOX, new RegExp('^\\b(?:' + optimFunctions + ')\\b'), null],
+<% end %>
 
 	// plain identifier (user-defined variable/function name)
 	[PR_IDENTIFIER, /^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)*/, null],

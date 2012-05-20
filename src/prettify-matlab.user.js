@@ -37,7 +37,9 @@
 	
 	// insert our custom CSS styles
 	style_inject([
-		//=INSERT_FILE_QUOTED= ../css/lang-matlab.css
+<% render(get_file('./lang-matlab.css')).each_line do |line| %>
+		<%= "'#{line.chomp}'," %>
+<% end %>
 	].join(""));
 
 	script_inject(function () {
@@ -90,7 +92,9 @@
 		}
 		
 		function RegisterMATLABLanguageHandlers() {
-			//=RENDER_FILE= ./_main.js
+<% render(get_file('./_main.js')).each_line do |line| %>
+			<%= line.chomp %>
+<% end %>
 		}
 	});
 })();
