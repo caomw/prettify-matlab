@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name           Mathworks Answers: MATLAB highlighter
-// @namespace      MathworksAnswers_GoogleCodePrettify_MATLAB
-// @description    Adds simple MATLAB syntax highlighting on Mathworks Answers
+// @name           Mathworks FileExchange: MATLAB highlighter
+// @namespace      MathworksFileExchange_GoogleCodePrettify_MATLAB
+// @description    Adds simple MATLAB syntax highlighting on Mathworks FileExchange
 // @author         Amro <amroamroamro@gmail.com>
 // @version        1.1
 // @license        MIT License
 // @icon           http://www.mathworks.com/favicon.ico
-// @include        http://www.mathworks.com/matlabcentral/answers/*
+// @include        http://www.mathworks.com/matlabcentral/fileexchange/*
 // @run-at         document-end
 // ==/UserScript==
 
@@ -38,7 +38,7 @@
 	}
 
 	// activate only on an actual question page (ignore question lists, and such)
-	if ( !/^\/matlabcentral\/answers\/\d+/.test(window.location.pathname) ) {
+	if ( !/^\/matlabcentral\/fileexchange\/\d+/.test(window.location.pathname) ) {
 		return;
 	}
 
@@ -86,7 +86,7 @@
 		'	.lang-matlab .untermstring { color: #B20000; }',
 		'}',
 		'/* use horizontal scrollbars instead of wrapping long lines */',
-		'pre.prettyprint { white-space: pre; overflow: auto; }',
+		'pre.prettyprint { white-space: pre !important; overflow: auto !important; }',
 		'/* add borders around code, give it a background color, and make it slightly indented */',
 		'pre.prettyprint { padding: 4px; margin-left: 1em; background-color: #EEEEEE; }'
 	].join(""));
@@ -97,7 +97,7 @@
 		if (typeof jQuery == 'undefined') { return; }
 
 		// use jQuery Deferred to load prettify JS library, then execute our code
-		$.ajax({
+		jQuery.ajax({
 			cache: true,	// use $.ajax instead of $.getScript to set cache=true (allows broswer to cache the script)
 			async: true,
 			dataType: 'script',
@@ -107,33 +107,15 @@
 			RegisterMATLABLanguageHandlers();
 
 			// on DOMContentLoaded
-			$(document).ready(function () {
-				// for each <pre.language-matlab> blocks
+			jQuery(document).ready(function () {
+				// for each <pre.matlab-code> blocks
 				var blocks = document.getElementsByTagName('pre');
 				for (var i = 0; i < blocks.length; ++i) {
-					if (blocks[i].className.indexOf('language-matlab') != -1) {
+					if (blocks[i].className.indexOf('matlab-code') != -1) {
 						// apply prettyprint class, and set the language to MATLAB
 						blocks[i].className = 'prettyprint lang-matlab';
 					}
 				}
-
-				// merge consecutive PRE blocks into one
-				$('pre').filter(function(){
-					// find first PRE from each group of PRE elements:
-					// check if its followed by PRE (but not itself being preceded by one)
-					return ( $(this).next().is('pre')) && !($(this).prev().is('pre') );
-				}).each(function() {
-					// get all following PRE elements
-					var el = $(this).nextUntil(function(){
-						return !($(this).is('pre'));	// until something not PRE
-					});
-					// get their html content, merge as one, and append it to first PRE
-					$(this).append( "\n" + el.map(function(){
-						return $(this).html();
-					}).get().join("\n") );
-					// remove those PRE elements
-					el.remove();
-				});
 
 				// apply highlighting
 				prettyPrint();
