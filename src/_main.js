@@ -80,7 +80,7 @@ var fallthroughStylePatterns = [
 	[PR.PR_TAG, /^(?:\{|\}|\(|\)|\[|\])/, null],	// "{}()[]"
 
 	// other operators
-	[PR.PR_PUNCTUATION, /^(?:<|>|=|~|@|&|;|,|:|!|\-|\+|\*|\^|\.|\||\\|\/)/, null],
+	[PR.PR_PUNCTUATION, /^(?:<|>|=|~|@|&|;|,|:|!|\-|\+|\*|\^|\.|\||\\|\/)/, null]
 ];
 
 var identifiersPatterns = [
@@ -94,7 +94,7 @@ var identifiersPatterns = [
 	[PR.PR_TYPE, /^\b(?:cell|struct|char|double|single|logical|u?int(?:8|16|32|64)|sparse)\b/, null],
 
 	// plain identifier (user-defined variable/function name)
-	[PR_IDENTIFIER, /^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)*/, null],
+	[PR_IDENTIFIER, /^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)*/, null]
 ];
 
 var operatorsPatterns = [
@@ -108,7 +108,7 @@ var operatorsPatterns = [
 	[PR.PR_PUNCTUATION, /^(?:<|>|=|~|@|&|;|,|:|!|\-|\+|\*|\^|\.|\||\\|\/)/, null],
 
 	// transpose operators
-	[PR_TRANSPOSE, /^'/, null],
+	[PR_TRANSPOSE, /^'/, null]
 ];
 
 PR.registerLangHandler(
